@@ -1,0 +1,545 @@
+🔹 Final Refined Prompt (Machine-Understandable Format)
+
+Project Name: Hostel Management System
+Tech Stack:
+
+Frontend: React (Vite + JavaScript)
+
+Backend: Spring Boot (Java 21)
+
+Database: MySQL
+
+ORM: Spring Data JPA
+
+Build Tool: Gradle or Maven
+
+Authentication: Spring Security + JWT
+
+🏗️ Core Functional Modules
+1. Authentication & Authorization
+
+Use JWT-based authentication.
+
+Implement Role-based Access Control (RBAC) with roles:
+
+ADMIN
+
+PSEUDO_ADMIN
+
+EMPLOYEE
+
+WORKER
+
+RESIDENT
+
+Admins can create and remove users of any role.
+
+Pseudo Admin inherits Admin’s rights but with limited duration and custom permissions.
+
+Residents register via signup and submit an Aadhar Card image (file) and ID number.
+
+Each user must have:
+
+id, username, password, email, role, status (active/inactive)
+
+For residents: aadharNumber, aadharImage, roomAssigned
+
+2. Admin Features
+
+Add, edit, and remove:
+
+Employees, Workers, Residents, and Pseudo Admins.
+
+Buildings, Rooms, and Services.
+
+Buildings Management:
+
+Fields: buildingId, buildingName, totalRooms, startingRoomNumber, customRoomNumbering (bool), createdAt
+
+Admin decides rent per room and can modify it later.
+
+Room Management:
+
+Fields: roomId, roomNumber, buildingId, sharingType (single/double/triple/custom), capacity, rent, occupants[]
+
+Admin can define default and custom sharing capacities.
+
+Service Management:
+
+Fields: serviceId, serviceName, description
+
+Assign workers to specific services.
+
+Pseudo Admin Management:
+
+Fields: pseudoAdminId, assignedBy, startDate, endDate, permissions[], isRevoked
+
+Allow revocation before expiry.
+
+Show history of previous pseudo admins.
+
+3. Pseudo Admin Features
+
+Has access similar to Admin based on assigned permissions:
+
+May manage rooms, residents, workers, or buildings.
+
+Cannot create other pseudo admins.
+
+4. Employee Features
+
+Can add residents and assign rooms to them.
+
+Can view available rooms with filters by sharing type.
+
+Can assign work requests to workers (by room number + service type).
+
+Can remove residents from rooms.
+
+Before assigning a room, must view:
+
+Resident’s details (name, Aadhar photo, Aadhar number).
+
+5. Worker Features
+
+Associated with one or more services.
+
+Receives service requests with:
+
+roomNumber, residentName, serviceType, note
+
+Can mark request as Completed.
+
+Request history is stored for 48 hours after completion.
+
+6. Resident Features
+
+Register → Upload Aadhar (file) + enter number.
+
+Can view assigned room details.
+
+Can raise service requests:
+
+Fields: requestId, residentId, serviceType, roomNumber, note, status (Pending/InProgress/Completed), createdAt
+
+Can track status of their requests.
+
+🧩 Entity Relationships (Simplified)
+
+Admin (1) ↔ Buildings (M)
+
+Building (1) ↔ Rooms (M)
+
+Room (1) ↔ Residents (M)
+
+Service (1) ↔ Workers (M)
+
+Worker (1) ↔ ServiceRequests (M)
+
+Employee (M) ↔ Residents (M) (via room assignment)
+
+PseudoAdmin (1) ↔ Permissions (M)
+
+💾 Database Table Fields (Key Suggestions)
+Entity	Important Fields
+User	id, name, email, password, role, status
+Building	id, name, totalRooms, baseRoomNo, roomCountStart, createdAt
+Room	id, buildingId, roomNumber, sharingType, capacity, rent, status
+Resident	id, userId, aadharNumber, aadharImagePath, assignedRoomId
+Employee	id, userId, assignedByAdminId
+Worker	id, userId, serviceId
+Service	id, name, description
+ServiceRequest	id, residentId, workerId, serviceId, note, status, createdAt, completedAt
+PseudoAdmin	id, userId, validFrom, validTo, permissions (JSON), revoked (bool)
+⚙️ Spring Boot Dependencies (Gradle/Maven)
+
+Required Core Dependencies:
+
+spring-boot-starter-web
+
+spring-boot-starter-data-jpa
+
+spring-boot-starter-security
+
+spring-boot-starter-validation
+
+jjwt-api, jjwt-impl, jjwt-jackson (for JWT)
+
+mysql-connector-j
+
+spring-boot-starter-mail (optional: for sending credentials)
+
+spring-boot-devtools (for hot reload)
+
+lombok (for cleaner model classes)
+
+Optional (for advanced features):
+
+springdoc-openapi-starter-webmvc-ui (for Swagger API docs)
+
+spring-boot-starter-thymeleaf (if you need admin email templates)
+
+⚛️ Vite + React Dependencies
+
+Essential:
+
+react, react-dom
+
+react-router-dom
+
+axios (for API calls)
+
+react-query (for data fetching)
+
+tailwindcss (for styling)
+
+@headlessui/react or shadcn/ui (for UI components)
+
+react-toastify (for notifications)
+
+formik + yup (for form validation)
+
+jwt-decode (to decode and handle JWT tokens)
+
+zustand or redux (for global state management)
+
+🔐 Authentication Flow Summary
+
+Use Spring Security with JWT tokens.
+
+Store JWT in HttpOnly cookies or localStorage (prefer HttpOnly).
+
+Protect routes in React using <PrivateRoute> and role-based access guards.
+
+Login → JWT issued → token validates user’s role → redirect to dashboard based on role.
+
+🧠 Bonus Ideas (for completeness)
+
+Dashboard per Role
+
+Each role sees only relevant info: Residents → Room + Requests, Employees → Room Assignments, Admin → Full control.
+
+Audit Logs
+
+Keep track of actions (who added/removed whom, rent updates, etc.)
+
+Notification System
+
+Workers get notified when assigned a new request.
+
+File Uploads
+
+Store Aadhar images in /uploads/aadhar/ with file naming as residentId_timestamp.jpg.
+
+Soft Deletes
+
+Instead of deleting records, mark them as inactive (status = false) for audit integrity.
+
+Create a full-stack Hostel Management System using React (Vite + JS) for frontend and Spring Boot (Java 21 + MySQL) for backend.
+
+Include role-based access control for Admin, Pseudo Admin, Employee, Worker, and Resident.
+
+Implement JWT authentication, MySQL persistence with JPA, and RESTful APIs for CRUD operations on users, buildings, rooms, services, and service requests.
+
+Follow the detailed role permissions and entity relationships defined below:
+[insert the above “Core Functional Modules”, “Entity Relationships”, and “Table Fields” sections here]
+
+
+🧱 Full Stack Architecture for Hostel Management System
+🧩 Tech Stack Summary
+Layer	Technology
+Frontend	Vite + React (JavaScript)
+Styling	Tailwind CSS
+State Management	Zustand or Redux Toolkit
+Form Handling	Formik + Yup
+Notifications	React Toastify
+HTTP	Axios
+Routing	React Router DOM
+Backend	Spring Boot (Java 21)
+ORM	Spring Data JPA
+Database	MySQL
+Auth	JWT + Spring Security
+Build Tool	Gradle
+API Docs	Swagger (springdoc-openapi)
+⚙️ BACKEND STRUCTURE (Spring Boot)
+
+Root package:
+com.hostelmanagement
+
+com.hostelmanagement
+│
+├── config/
+│   ├── SecurityConfig.java
+│   ├── JwtAuthFilter.java
+│   ├── JwtUtil.java
+│   └── CorsConfig.java
+│
+├── controller/
+│   ├── AuthController.java
+│   ├── AdminController.java
+│   ├── PseudoAdminController.java
+│   ├── EmployeeController.java
+│   ├── WorkerController.java
+│   ├── ResidentController.java
+│   ├── BuildingController.java
+│   ├── RoomController.java
+│   ├── ServiceController.java
+│   └── ServiceRequestController.java
+│
+├── dto/
+│   ├── LoginRequest.java
+│   ├── SignupRequest.java
+│   ├── RoomDTO.java
+│   ├── BuildingDTO.java
+│   ├── ServiceRequestDTO.java
+│   └── UserDTO.java
+│
+├── entity/
+│   ├── User.java
+│   ├── Role.java
+│   ├── Building.java
+│   ├── Room.java
+│   ├── Resident.java
+│   ├── Employee.java
+│   ├── Worker.java
+│   ├── Service.java
+│   ├── ServiceRequest.java
+│   └── PseudoAdmin.java
+│
+├── repository/
+│   ├── UserRepository.java
+│   ├── BuildingRepository.java
+│   ├── RoomRepository.java
+│   ├── ResidentRepository.java
+│   ├── EmployeeRepository.java
+│   ├── WorkerRepository.java
+│   ├── ServiceRepository.java
+│   ├── ServiceRequestRepository.java
+│   └── PseudoAdminRepository.java
+│
+├── service/
+│   ├── AuthService.java
+│   ├── UserService.java
+│   ├── AdminService.java
+│   ├── EmployeeService.java
+│   ├── WorkerService.java
+│   ├── PseudoAdminService.java
+│   ├── RoomService.java
+│   ├── BuildingService.java
+│   └── ServiceRequestService.java
+│
+├── exception/
+│   ├── CustomException.java
+│   ├── ResourceNotFoundException.java
+│   ├── InvalidRoleException.java
+│   └── GlobalExceptionHandler.java
+│
+├── util/
+│   ├── FileStorageUtil.java  // for saving Aadhar images
+│   ├── RoleConstants.java
+│   └── PermissionConstants.java
+│
+└── HostelManagementApplication.java
+
+🗄️ Backend Folder Logic Summary
+
+config/ — All security, JWT, and CORS configurations.
+
+controller/ — REST endpoints per entity or role.
+
+dto/ — Transfer objects to decouple entity data from request/response.
+
+entity/ — JPA entities mapped to MySQL tables.
+
+repository/ — JPA repositories for CRUD and query operations.
+
+service/ — Business logic layer.
+
+exception/ — Centralized error handling.
+
+util/ — Helper utilities (e.g., file uploads, role constants).
+
+⚙️ Backend Key Endpoints Overview
+Endpoint	Method	Access	Description
+/api/auth/login	POST	Public	Authenticate user via JWT
+/api/auth/signup	POST	Public	Register resident
+/api/admin/addBuilding	POST	Admin	Add building details
+/api/admin/addRoom	POST	Admin	Add rooms in building
+/api/admin/addPseudoAdmin	POST	Admin	Create pseudo admin with permissions
+/api/employee/addResident	POST	Employee	Add resident
+/api/employee/assignRoom	PUT	Employee	Assign resident to room
+/api/serviceRequest/add	POST	Resident	Create service request
+/api/worker/updateRequestStatus	PUT	Worker	Mark service request completed
+🧩 Database Entity Mapping Overview (Simplified UML Logic)
+User
+ ├── id, name, email, password, role, status
+ ├── OneToOne → Resident / Worker / Employee / PseudoAdmin (depending on role)
+
+Building
+ ├── id, name, totalRooms, baseRoomNo, createdAt
+ └── OneToMany → Room
+
+Room
+ ├── id, number, sharingType, rent, status
+ ├── ManyToOne → Building
+ └── OneToMany → Resident
+
+Service
+ ├── id, name, description
+ └── OneToMany → Worker
+
+ServiceRequest
+ ├── id, note, status, createdAt, completedAt
+ ├── ManyToOne → Resident
+ ├── ManyToOne → Worker
+ └── ManyToOne → Service
+
+⚛️ FRONTEND STRUCTURE (Vite + React + Tailwind)
+
+Root: /client
+
+client/
+│
+├── public/
+│   └── index.html
+│
+├── src/
+│   ├── api/
+│   │   ├── axiosInstance.js
+│   │   ├── authApi.js
+│   │   ├── buildingApi.js
+│   │   ├── roomApi.js
+│   │   ├── serviceApi.js
+│   │   ├── serviceRequestApi.js
+│   │   └── userApi.js
+│   │
+│   ├── assets/
+│   │   └── logo.svg
+│   │
+│   ├── components/
+│   │   ├── forms/
+│   │   │   ├── LoginForm.jsx
+│   │   │   ├── SignupForm.jsx
+│   │   │   └── AddResidentForm.jsx
+│   │   ├── dashboard/
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── EmployeeDashboard.jsx
+│   │   │   ├── WorkerDashboard.jsx
+│   │   │   ├── ResidentDashboard.jsx
+│   │   │   └── PseudoAdminDashboard.jsx
+│   │   ├── common/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── ProtectedRoute.jsx
+│   │   │   └── Modal.jsx
+│   │   └── cards/
+│   │       ├── RoomCard.jsx
+│   │       ├── ServiceCard.jsx
+│   │       └── ResidentCard.jsx
+│   │
+│   ├── context/
+│   │   ├── AuthContext.jsx
+│   │   └── RoleContext.jsx
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.js
+│   │   ├── useFetch.js
+│   │   └── useRoleGuard.js
+│   │
+│   ├── pages/
+│   │   ├── Login.jsx
+│   │   ├── Signup.jsx
+│   │   ├── AdminPanel.jsx
+│   │   ├── EmployeePanel.jsx
+│   │   ├── ResidentPanel.jsx
+│   │   ├── WorkerPanel.jsx
+│   │   └── PseudoAdminPanel.jsx
+│   │
+│   ├── router/
+│   │   └── AppRouter.jsx
+│   │
+│   ├── store/
+│   │   └── useAuthStore.js
+│   │
+│   ├── styles/
+│   │   └── index.css
+│   │
+│   ├── utils/
+│   │   ├── tokenUtils.js
+│   │   └── roleUtils.js
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+│
+└── tailwind.config.js
+
+🧭 Frontend Functional Flow
+
+Login / Signup
+
+Resident signup → upload Aadhar + number → backend verification.
+
+JWT stored in localStorage.
+
+Role-Based Dashboards
+
+Redirect based on role from JWT.
+
+Admin → manage all modules.
+
+Employee → manage residents & room assignments.
+
+Worker → manage assigned service tasks.
+
+Resident → view room & raise service requests.
+
+Protected Routes
+
+ProtectedRoute component checks JWT validity and role.
+
+UI States
+
+Zustand store maintains auth, userRole, and session details.
+
+⚙️ Frontend API Workflow Example
+// axiosInstance.js
+import axios from "axios";
+
+const instance = axios.create({
+  baseURL: "http://localhost:8080/api",
+  headers: { "Content-Type": "application/json" },
+});
+
+instance.interceptors.request.use(config => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default instance;
+
+📦 Recommended npm Packages
+npm install react-router-dom axios tailwindcss postcss autoprefixer react-toastify formik yup jwt-decode zustand
+
+🧠 Advanced Add-ons (Optional for Later)
+Feature	Purpose	Stack
+File Uploads	Store Aadhar images	Spring Boot Multipart + Frontend file input
+Activity Logs	Track user actions	MySQL Audit Table
+Dashboard Charts	Visualization	Recharts / Chart.js
+Email Notifications	Send pseudo admin creds	Spring Boot Mail
+Admin Reports	Occupancy and service stats	Custom API + CSV export
+🚀 Development Flow Recommendation
+
+Step 1: Scaffold Spring Boot backend with entities + JWT auth.
+
+Step 2: Create REST endpoints per role/module.
+
+Step 3: Test APIs via Postman or Swagger.
+
+Step 4: Create Vite React project and connect to backend via Axios.
+
+Step 5: Implement role-based routing & dashboards.
+
+Step 6: Add service request flow and room assignment.
+
+Step 7: Refine UI with Tailwind, modals, and validation.
